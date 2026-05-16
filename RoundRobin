@@ -1,0 +1,84 @@
+#include <iostream>
+using namespace std;
+
+struct Process
+{
+    int id, bt, at, rt, ct, tat, wt;
+};
+
+int main()
+{
+    int n, tq;
+
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    Process p[10];
+
+    for(int i = 0; i < n; i++)
+    {
+        p[i].id = i + 1;
+
+        cout << "Enter AT and BT for P" << i+1 << ": ";
+        cin >> p[i].at >> p[i].bt;
+
+        p[i].rt = p[i].bt;
+    }
+
+    cout << "Enter Time Quantum: ";
+    cin >> tq;
+
+    int completed = 0;
+    int time = 0;
+
+    while(completed < n)
+    {
+        bool executed = false;
+
+        for(int i = 0; i < n; i++)
+        {
+
+            if(p[i].at <= time && p[i].rt > 0)
+            {
+                executed = true;
+                if(p[i].rt <= tq)
+                {
+                    time += p[i].rt;
+
+                    p[i].rt = 0;
+
+                    p[i].ct = time;
+                    p[i].tat = p[i].ct - p[i].at;
+                    p[i].wt = p[i].tat - p[i].bt;
+
+                    completed++;
+                }
+                else
+                {
+                    p[i].rt -= tq;
+
+                    time += tq;
+                }
+            }
+        }
+
+        if(!executed)
+        {
+            time++;
+        }
+    }
+
+    cout << "\nPID\tAT\tBT\tCT\tTAT\tWT\n";
+
+    for(int i = 0; i < n; i++)
+    {
+        cout << p[i].id << "\t"
+             << p[i].at << "\t"
+             << p[i].bt << "\t"
+             << p[i].ct << "\t"
+             << p[i].tat << "\t"
+             << p[i].wt << endl;
+    }
+
+    return 0;
+}
