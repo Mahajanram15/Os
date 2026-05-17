@@ -1,0 +1,114 @@
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    int n, m;
+
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    cout << "Enter number of resources: ";
+    cin >> m;
+
+    int alloc[10][10], max[10][10], need[10][10];
+    int avail[10];
+
+    cout << "Enter Allocation Matrix:\n";
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < m; j++)
+        {
+            cin >> alloc[i][j];
+        }
+    }
+    cout << "Enter Max Matrix:\n";
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < m; j++)
+        {
+            cin >> max[i][j];
+        }
+    }
+
+    cout << "Enter Available Resources:\n";
+    for(int i = 0; i < m; i++)
+    {
+        cin >> avail[i];
+    }
+
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < m; j++)
+        {
+            need[i][j] = max[i][j] - alloc[i][j];
+        }
+    }
+
+    bool finish[10] = {false};
+
+    int safeSeq[10];
+    int count = 0;
+
+    while(count < n)
+    {
+        bool found = false;
+
+        for(int i = 0; i < n; i++)
+        {
+            if(!finish[i])
+            {
+                bool possible = true;
+
+                for(int j = 0; j < m; j++)
+                {
+                    if(need[i][j] > avail[j])
+                    {
+                        possible = false;
+                        break;
+                    }
+                }
+
+                if(possible)
+                {
+                    for(int j = 0; j < m; j++)
+                    {
+                        avail[j] += alloc[i][j];
+                    }
+
+                    safeSeq[count++] = i;
+
+                    finish[i] = true;
+
+                    found = true;
+                }
+            }
+        }
+
+        if(!found)
+        {
+            break;
+        }
+    }
+
+    if(count == n)
+    {
+        cout << "System is in SAFE state\n";
+
+        cout << "Safe Sequence: ";
+
+        for(int i = 0; i < n; i++)
+        {
+            cout << "P" << safeSeq[i];
+
+            if(i != n-1)
+                cout << " -> ";
+        }
+    }
+    else
+    {
+        cout << "\nSystem is NOT in safe state";
+    }
+
+    return 0;
+}
