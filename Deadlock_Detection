@@ -1,0 +1,129 @@
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    int n = 5; 
+    int m;
+
+    cout << "Enter number of resources: ";
+    cin >> m;
+
+    int allocation[10][10];
+    int request[10][10];
+    int total[10];
+    int available[10];
+
+    cout << "\nEnter Allocation Matrix:\n";
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < m; j++)
+        {
+            cin >> allocation[i][j];
+        }
+    }
+
+    cout << "\nEnter Request Matrix:\n";
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < m; j++)
+        {
+            cin >> request[i][j];
+        }
+    }
+
+    cout << "\nEnter Total Resources:\n";
+    for(int i = 0; i < m; i++)
+    {
+        cin >> total[i];
+    }
+
+    for(int j = 0; j < m; j++)
+    {
+        int sum = 0;
+
+        for(int i = 0; i < n; i++)
+        {
+            sum += allocation[i][j];
+        }
+
+        available[j] = total[j] - sum;
+    }
+
+    cout << "\nAvailable Resources: ";
+    for(int i = 0; i < m; i++)
+    {
+        cout << available[i] << " ";
+    }
+
+    bool finish[10] = {false};
+
+    int work[10];
+
+    for(int i = 0; i < m; i++)
+    {
+        work[i] = available[i];
+    }
+
+    bool progress = true;
+
+    while(progress)
+    {
+        progress = false;
+
+        for(int i = 0; i < n; i++)
+        {
+            if(!finish[i])
+            {
+                bool possible = true;
+
+                for(int j = 0; j < m; j++)
+                {
+                    if(request[i][j] > work[j])
+                    {
+                        possible = false;
+                        break;
+                    }
+                }
+
+                if(possible)
+                {
+                    for(int j = 0; j < m; j++)
+                    {
+                        work[j] += allocation[i][j];
+                    }
+
+                    finish[i] = true;
+
+                    progress = true;
+                }
+            }
+        }
+    }
+
+    bool deadlock = false;
+
+    cout << "\n\nDeadlocked Processes: ";
+
+    for(int i = 0; i < n; i++)
+    {
+        if(!finish[i])
+        {
+            cout << "P" << i << " ";
+            deadlock = true;
+        }
+    }
+
+    cout << endl;
+
+    if(deadlock)
+    {
+        cout << "\nSystem IS in Deadlock\n";
+    }
+    else
+    {
+        cout << "\nSystem is NOT in Deadlock\n";
+    }
+
+    return 0;
+}
