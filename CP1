@@ -1,0 +1,237 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+
+class OS
+{
+private:
+
+    char M[100][4];   
+    char IR[4];       
+    char R[4];       
+
+    int IC;          
+
+    bool C;     
+
+    int SI;
+
+    ifstream input;
+    ofstream output;
+
+public:
+
+    OS()
+    {
+        input.open("input.txt");
+        output.open("output.txt");
+
+        if(!input || !output)
+        {
+            cout << "File Error";
+            exit(0);
+        }
+    }
+
+    void INIT()
+    {
+        for(int i = 0; i < 100; i++)
+        {
+            for(int j = 0; j < 4; j++)
+            {
+                M[i][j] = ' ';
+            }
+        }
+
+        for(int i = 0; i < 4; i++)
+        {
+            IR[i] = ' ';
+            R[i] = ' ';
+        }
+
+        IC = 0;
+        C = false;
+        SI = 0;
+    }
+
+    void READ()
+    {
+        string line;
+
+        getline(input, line);
+
+        int loc = (IR[2] - '0') * 10 + (IR[3] - '0');
+
+        for(int i = 0; i < 4; i++)
+        {
+            M[loc][i] = line[i];
+        }
+    }
+
+    void WRITE()
+    {
+        int loc = (IR[2] - '0') * 10 + (IR[3] - '0');
+
+        for(int i = 0; i < 4; i++)
+        {
+            output << M[loc][i];
+        }
+
+        output << endl;
+    }
+
+    void TERMINATE()
+    {
+        output << endl;
+    }
+
+    // MOS Function
+    void MOS()
+    {
+        if(SI == 1)
+        {
+            READ();
+        }
+        else if(SI == 2)
+        {
+            WRITE();
+        }
+        else if(SI == 3)
+        {
+            TERMINATE();
+        }
+
+        SI = 0;
+    }
+
+    void EXECUTE()
+    {
+        while(true)
+        {
+            // Fetch instruction
+            for(int i = 0; i < 4; i++)
+            {
+                IR[i] = M[IC][i];
+            }
+
+            IC++;
+
+            string opcode = "";
+
+            opcode += IR[0];
+            opcode += IR[1];
+
+            int loc = (IR[2] - '0') * 10 + (IR[3] - '0');
+
+            if(opcode == "GD")
+            {
+                SI = 1;
+                MOS();
+            }
+
+            else if(opcode == "PD")
+            {
+                SI = 2;
+                MOS();
+            }
+
+            else if(opcode == "LR")
+            {
+                for(int i = 0; i < 4; i++)
+                {
+                    R[i] = M[loc][i];
+                }
+            }
+
+            else if(opcode == "SR")
+            {
+                for(int i = 0; i < 4; i++)
+                {
+                    M[loc][i] = R[i];
+                }
+            }
+
+            else if(opcode == "CR")
+            {
+                C = true;
+
+                for(int i = 0; i < 4; i++)
+                {
+                    if(R[i] != M[loc][i])
+                    {
+                        C = false;
+                        break;
+                    }
+                }
+            }
+
+            else if(opcode == "BT")
+            {
+                if(C == true)
+                {
+                    IC = loc;
+                }
+            }
+
+            else if(IR[0] == 'H')
+            {
+                SI = 3;
+                MOS();
+                break;
+            }
+        }
+    }
+
+    void LOAD()
+    {
+        string line;
+
+        int m = 0;
+
+        while(getline(input, line))
+        {
+            if(line.substr(0,4) == "$AMJ")
+            {
+                INIT();
+                m = 0;
+            }
+
+            else if(line.substr(0,4) == "$DTA")
+            {
+                IC = 0;
+                EXECUTE();
+            }
+
+            else if(line.substr(0,4) == "$END")
+            {
+                continue;
+            }
+
+            else
+            {
+                int k = 0;
+
+                while(k < line.length())
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        M[m][i] = line[k];
+                        k++;
+                    }
+
+                    m++;
+                }
+            }
+        }
+    }
+};
+
+int main()
+{
+    OS os;
+
+    os.LOAD();
+
+    return 0;
+}
