@@ -1,0 +1,57 @@
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <semaphore.h>
+
+using namespace std;
+
+int rc = 0;
+
+mutex mtx;
+sem_t db;
+
+void reader(int id)
+{
+    mtx.lock();
+    rc++;
+    if(rc == 1){
+        sem_wait(&db);
+    }
+    mtx.unlock();
+    mtx.lock();
+    cout << "Reader "<< id << " is Reading" << endl;
+    mtx.unlock();
+    mtx.lock();
+    rc--;
+    if(rc == 0){
+        sem_post(&db);
+    }
+    mtx.unlock();
+}
+
+void writer(int id)
+{
+    sem_wait(&db);
+    mtx.lock();
+    cout << "Writer " << id << " is Writing" << endl;
+    mtx.unlock();
+    sem_post(&db);
+}
+
+int main()
+{
+    sem_init(&db, 0, 1);
+
+    thread r1(reader, 1);
+    thread r2(reader, 2);
+
+    thread w1(writer, 1);
+
+    r1.join();
+    r2.join();
+    w1.join();
+
+    sem_destroy(&db);
+
+    return 0;
+}
