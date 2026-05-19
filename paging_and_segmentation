@@ -1,0 +1,58 @@
+#include <iostream>
+using namespace std;
+
+int main()
+{
+
+    int pageSize;
+    int logicalAddress;
+
+    cout << "Enter Page Size: ";
+    cin >> pageSize;
+
+    cout << "Enter Logical Address: ";
+    cin >> logicalAddress;
+
+    int pageNumber = logicalAddress / pageSize;
+
+    int offset = logicalAddress % pageSize;
+
+    int frameNumber;
+
+    cout << "Enter Frame Number: ";
+    cin >> frameNumber;
+
+    int physicalAddress =
+        (frameNumber * pageSize) + offset;
+
+    cout << "\nPaging Physical Address = "
+         << physicalAddress << endl;
+
+    int base;
+    int limit;
+    int segOffset;
+
+    cout << "\nEnter Base Address: ";
+    cin >> base;
+
+    cout << "Enter Limit: ";
+    cin >> limit;
+
+    cout << "Enter segOffset: ";
+    cin >> segOffset;
+
+    if(segOffset < limit)
+    {
+        physicalAddress = base + segOffset;
+
+        cout << "\nSegmentation Physical Address = "
+             << physicalAddress << endl;
+    }
+    else
+    {
+        cout << "\nInvalid Offset" << endl;
+    }
+
+    
+    return 0;
+}
