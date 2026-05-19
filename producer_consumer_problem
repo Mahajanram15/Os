@@ -1,0 +1,58 @@
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <semaphore.h>
+
+using namespace std;
+#define SIZE 5
+
+int buffer[SIZE];
+
+int in = 0;
+int out = 0;
+
+sem_t empty_sem;
+sem_t full_sem;
+
+mutex mtx;
+
+void producer()
+{
+    for(int i = 1; i <= 5; i++)
+    {
+        sem_wait(&empty_sem);
+        mtx.lock();
+        buffer[in] = i;
+        cout << "Produced: " << buffer[in] << endl;
+        in = (in + 1) % SIZE;
+        mtx.unlock();
+        sem_post(&full_sem);
+    }
+}
+
+void consumer()
+{
+    for(int i = 1; i <= 5; i++)
+    {
+        sem_wait(&full_sem);
+        mtx.lock();
+        int item = buffer[out];
+        cout << "Consumed: " << item << endl;
+        out = (out + 1) % SIZE;
+        mtx.unlock();
+        sem_post(&empty_sem);
+    }
+}
+
+int main()
+{
+    sem_init(&empty_sem, 0, SIZE);
+    sem_init(&full_sem, 0, 0);
+    thread p(producer);
+    thread c(consumer);
+    p.join();
+    c.join();
+    sem_destroy(&empty_sem);
+    sem_destroy(&full_sem);
+    return 0;
+}
