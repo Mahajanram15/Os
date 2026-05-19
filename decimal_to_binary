@@ -1,0 +1,45 @@
+#!/bin/bash
+
+echo "1. Decimal to Binary"
+echo "2. Binary to Decimal"
+
+echo "Enter your choice:"
+read choice
+
+if [ $choice -eq 1 ]
+then
+    echo "Enter decimal number:"
+    read num
+
+    binary=""
+
+    while [ $num -gt 0 ]
+    do
+        rem=$((num % 2))
+        binary=$rem$binary
+        num=$((num / 2))
+    done
+
+    echo "Binary number is: $binary"
+
+elif [ $choice -eq 2 ]
+then
+    echo "Enter binary number:"
+    read binary
+
+    decimal=0
+    power=1
+
+    while [ $binary -gt 0 ]
+    do
+        rem=$((binary % 10))
+        decimal=$((decimal + rem * power))
+        power=$((power * 2))
+        binary=$((binary / 10))
+    done
+
+    echo "Decimal number is: $decimal"
+
+else
+    echo "Invalid choice"
+fi
